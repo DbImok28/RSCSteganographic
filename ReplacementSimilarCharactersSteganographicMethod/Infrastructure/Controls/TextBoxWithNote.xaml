@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="RSCSteganographicMethod.Infrastructure.Controls.TextBoxWithNote"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RSCSteganographicMethod.Infrastructure.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="24" d:DesignWidth="80" Name="This">
+    <Grid>
+        <PasswordBox x:Name="InputPasswordBlock" Panel.ZIndex="1" Height="24" PasswordChanged="InputPasswordBlock_PasswordChanged" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+        <TextBox x:Name="InputTextBlock" Panel.ZIndex="0" TextChanged="InputTextBlock_TextChanged" Height="24" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="{Binding Password, ElementName=InputPasswordBlock, Mode=TwoWay}"/>
+        <TextBlock IsHitTestVisible="False" Margin="4,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                       x:Name="NoteTextBlock" Text="{Binding NoteText, ElementName=This}" Panel.ZIndex="2" Opacity="0.4"/>
+    </Grid>
+</UserControl>

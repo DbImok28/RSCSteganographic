@@ -1,0 +1,180 @@
+﻿<Window x:Class="RSCSteganographicMethod.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:RSCSteganographicMethod.Infrastructure.Controls"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:vm="clr-namespace:RSCSteganographicMethod.ViemModules"
+        xmlns:local="clr-namespace:RSCSteganographicMethod"
+        mc:Ignorable="d"
+        DataContext="{Binding MainVM, Source={StaticResource vmlocator}}"
+        Title="{Binding Title}"
+        BorderThickness="3" BorderBrush="{StaticResource ElementBorderColor}"
+        Height="450" Width="800">
+    <Grid Background="{StaticResource Element2PlanBackgroundColor}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <TabControl Background="{StaticResource Element2PlanBackgroundColor}" BorderThickness="0">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{StaticResource ElementBorderColor}" CornerRadius="4,4,0,0" Margin="2,0">
+                                    <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource Element2PlanBackgroundColor}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource BackgroundColor}" />
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="False"/>
+                                            <Condition Property="IsMouseOver" Value="True"/>
+                                        </MultiTrigger.Conditions>
+                                        <MultiTrigger.Setters>
+                                            <Setter TargetName="Border" Property="Background" Value="{StaticResource MutedSelectedColor}"/>
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+            <TabItem Header="Encrypt" Background="{StaticResource BackgroundColor}" BorderThickness="0">
+                <StackPanel Margin="0,5,0,5" Grid.Row="1" VerticalAlignment="Stretch">
+                    <Label Margin="10,5,10,0" Content="Расшифрование" HorizontalAlignment="Left"/>
+                    <TextBox TextWrapping="WrapWithOverflow" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"></TextBox>
+                    <Label Margin="10,5,10,0" Content="Шифрование" HorizontalAlignment="Left"/>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="Исходный файл" Width="200"/>
+                        <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding SourceEncryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </DockPanel>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="Результирующий файла" Width="200"/>
+                        <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding ResultEncryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </DockPanel>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="" Width="200"/>
+                        <Button Content="Зашифровать" Command="{Binding EncryptCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
+                    </DockPanel>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="Затрачено времени" Width="200"/>
+                        <Label Content="{Binding EncryptionTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </DockPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Decrypt" Background="{StaticResource BackgroundColor}">
+                <StackPanel Margin="0,5,0,5" Grid.Row="1" VerticalAlignment="Bottom">
+                    <Label Margin="10,5,10,0" Content="Расшифрование" HorizontalAlignment="Left"/>
+                    <TextBox TextWrapping="WrapWithOverflow" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"></TextBox>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="Исходный файл" Width="200"/>
+                        <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding SourceDecryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </DockPanel>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="Результирующий файла" Width="200"/>
+                        <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding ResultDecryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </DockPanel>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="" Width="200"/>
+                        <Button Content="Зашифровать" Command="{Binding DecryptCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
+                    </DockPanel>
+                    <DockPanel Margin="10,5,10,0" Height="25">
+                        <Label Content="Затрачено времени" Width="200"/>
+                        <Label Content="{Binding DecryptionTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </DockPanel>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+
+        <GridSplitter Background="{StaticResource ElementBorderColor}" Grid.Column="0" Width="6" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+        <DockPanel VerticalAlignment="Stretch" Grid.Column="1">
+            <ItemsControl DockPanel.Dock="Top" Panel.ZIndex="0"
+                ItemsSource="{Binding ReplacementAlphabet.StringPairsWithLabel}" Margin="5,0,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Margin="1" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{Binding Key}" Width="50" Height="18" DockPanel.Dock="Left"></TextBlock>
+                            <!--<TextBlock Text="->" Width="25" Height="18" DockPanel.Dock="Left"></TextBlock>-->
+                            <fa:FontAwesome Margin="0,0,10,0" Icon="ArrowRight" VerticalAlignment="Center" Foreground="{StaticResource WhiteElementForegroundColor}"></fa:FontAwesome>
+                            <TextBlock Text="{Binding Value}" Width="50" Height="18" DockPanel.Dock="Left"></TextBlock>
+                            <Button Margin="10,0,10,0" DockPanel.Dock="Right" HorizontalAlignment="Right" 
+                                Background="{StaticResource ElementBackgroundColor}" 
+                                BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1" Width="17" Height="17"
+                                    CommandParameter="{Binding Key}">
+                                <fa:FontAwesome Icon="Remove" FontSize="12" Foreground="{StaticResource ElementForegroundColor}"/>
+                            </Button>
+                        </DockPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+
+                        <!--<UniformGrid Rows="1"/>-->
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <DockPanel VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Margin="10,5,10,5" Height="25" Panel.ZIndex="1">
+                <TextBox Margin="4,0,4,0" TextAlignment="Center" Width="23" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                <fa:FontAwesome Icon="ArrowRight" VerticalAlignment="Center" Foreground="{StaticResource WhiteElementForegroundColor}"></fa:FontAwesome>
+                <TextBox Margin="4,0,4,0" TextAlignment="Center" Width="23" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                <Button Margin="4,0,4,0" Content="Добавить" Command="{Binding AddReplacementAlphabetSymbol}" CommandParameter="{}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
+            </DockPanel>
+        </DockPanel>
+        <!--<ItemsControl Grid.Column="1"
+                ItemsSource="{Binding ReplacementAlphabet.ReplaceDictionary}" Margin="5,0,10,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <TextBlock VerticalAlignment="Bottom" Text="{Binding Key}" HorizontalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Bottom" Text="{Binding Value}" HorizontalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+
+                    -->
+        <!--<UniformGrid Rows="1"/>-->
+        <!--
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>-->
+
+        <!--<ItemsControl Grid.Column="1"
+                ItemsSource="{Binding FrequencyAllocOfRecivedMessage}" Margin="5,0,10,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <ProgressBar Orientation="Vertical" Value="{Binding Frequency}" Margin="2,2,2,12" Background="{x:Null}" BorderThickness="0"/>
+                        <TextBlock VerticalAlignment="Bottom" Text="{Binding Symbol}" HorizontalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    -->
+        <!--<StackPanel Orientation="Horizontal"/>-->
+        <!--
+                    <UniformGrid Rows="1"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>-->
+    </Grid>
+</Window>
