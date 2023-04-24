@@ -1,25 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace ReplacementSimilarCharactersSteganographicMethod.Models
 {
-    public class RSCSteganographicAnalyzer
+    public static class RSCSteganographicAnalyzer
     {
-        private string Text { get; set; }
-        private RSCAlphabet Alphabet { get; set; }
-
-        public RSCSteganographicAnalyzer(string text, RSCAlphabet alphabet)
+        public static long Capacity(string text, RSCAlphabet alphabet)
         {
-            Text = text;
-            Alphabet = alphabet;
-        }
-
-        public long Capacity()
-        {
-            return Text.Count(x => Alphabet.ReplaceDictionary.ContainsKey(x));
+            return text.Count(x => alphabet.Contains(x));
         }
     }
 }

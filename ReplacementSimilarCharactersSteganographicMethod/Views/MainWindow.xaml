@@ -83,19 +83,29 @@
                             HorizontalAlignment="Stretch" 
                             VerticalAlignment="Stretch" 
                             Height="Auto">
-                        <TextBox Margin="10,5,10,0"
-                             DockPanel.Dock="Top" Height="200"
-                             Width="Auto"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             HorizontalScrollBarVisibility="Disabled"
-                             VerticalScrollBarVisibility="Auto"  
-                             VerticalAlignment="Stretch" 
-                             HorizontalAlignment="Stretch" 
-                             VerticalContentAlignment="Top"/>
+                        <TextBox 
+                            Text="{Binding Message, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="10,5,10,0"
+                            DockPanel.Dock="Top" Height="150"
+                            Width="Auto"
+                            TextWrapping="Wrap"
+                            AcceptsReturn="True"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Auto"  
+                            VerticalAlignment="Stretch" 
+                            HorizontalAlignment="Stretch" 
+                            VerticalContentAlignment="Top"/>
+                        <DockPanel Margin="10,5,10,0" Height="25">
+                            <Label Content="Емкость" Width="200"/>
+                            <Label Content="{Binding FileCappacityStr}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                        </DockPanel>
                     </DockPanel>
                     <DockPanel DockPanel.Dock="Top" Width="Auto" VerticalAlignment="Bottom">
                         <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                            <DockPanel Margin="10,5,10,0" Height="25">
+                                <Label Content="Размерность символа" Width="200"/>
+                                <TextBox Text="{Binding BitsInMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                            </DockPanel>
                             <DockPanel Margin="10,5,10,0" Height="25">
                                 <Label Content="Исходный файл" Width="200"/>
                                 <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding SourceEncryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
@@ -121,29 +131,35 @@
                     <DockPanel DockPanel.Dock="Top" VerticalAlignment="Top">
                         <Label Margin="10,5,10,0" Content="Расшифровка" HorizontalAlignment="Left"/>
                     </DockPanel>
-                    <TextBox Margin="10,5,10,0"
-                             DockPanel.Dock="Top" Height="200"
-                             Width="Auto"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             HorizontalScrollBarVisibility="Disabled"
-                             VerticalScrollBarVisibility="Auto"  
-                             VerticalAlignment="Stretch" 
-                             HorizontalAlignment="Stretch" 
-                             VerticalContentAlignment="Top"/>
+                    <TextBox 
+                        Text="{Binding DecryptedMessage}"
+                        Margin="10,5,10,0"
+                        DockPanel.Dock="Top" Height="200"
+                        Width="Auto"
+                        TextWrapping="Wrap"
+                        AcceptsReturn="True"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto"  
+                        VerticalAlignment="Stretch" 
+                        HorizontalAlignment="Stretch" 
+                        VerticalContentAlignment="Top"/>
                     <DockPanel DockPanel.Dock="Top" Width="Auto" VerticalAlignment="Bottom">
                         <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                            <DockPanel Margin="10,5,10,0" Height="25">
+                                <Label Content="Размерность символа" Width="200"/>
+                                <TextBox Text="{Binding BitsInMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                            </DockPanel>
                             <DockPanel Margin="10,5,10,0" Height="25">
                                 <Label Content="Исходный файл" Width="200"/>
                                 <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding SourceDecryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                             </DockPanel>
-                            <DockPanel Margin="10,5,10,0" Height="25">
+                            <!--<DockPanel Margin="10,5,10,0" Height="25">
                                 <Label Content="Результирующий файла" Width="200"/>
                                 <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding ResultDecryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                            </DockPanel>
+                            </DockPanel>-->
                             <DockPanel Margin="10,5,10,0" Height="25">
                                 <Label Content="" Width="200"/>
-                                <Button Content="Зашифровать" Command="{Binding DecryptCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
+                                <Button Content="Расшифровать" Command="{Binding DecryptCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
                             </DockPanel>
                             <DockPanel Margin="10,5,10,0" Height="25">
                                 <Label Content="Затрачено времени" Width="200"/>

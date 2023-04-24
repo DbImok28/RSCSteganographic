@@ -2,9 +2,7 @@
 using RSCSteganographicMethod.Infrastructure.Commands;
 using RSCSteganographicMethod.Models;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -44,7 +42,11 @@ namespace RSCSteganographicMethod.ViemModules
         public string SourceEncryptFile
         {
             get => _SourceEncryptFile;
-            set => Set(ref _SourceEncryptFile, value);
+            set
+            {
+                Set(ref _SourceEncryptFile, value);
+                OnPropertyChanged(nameof(FileCappacityStr));
+            }
         }
         #endregion
         #region ResultEncryptFile
@@ -63,32 +65,7 @@ namespace RSCSteganographicMethod.ViemModules
             set => Set(ref _SourceDecryptFile, value);
         }
         #endregion
-
-        #region ResultDecryptFile
-        private string _ResultDecryptFile;
-        public string ResultDecryptFile
-        {
-            get => _ResultDecryptFile;
-            set => Set(ref _ResultDecryptFile, value);
-        }
         #endregion
-        #endregion
-        //#region FrequencyAllocationOfOriginalMessage
-        //private ObservableCollection<SymbolFrequency> _FrequencyAllocOfOriginalMessage = new();
-        //public ObservableCollection<SymbolFrequency> FrequencyAllocOfOriginalMessage
-        //{
-        //    get => _FrequencyAllocOfOriginalMessage;
-        //    set => Set(ref _FrequencyAllocOfOriginalMessage, value);
-        //}
-        //#endregion
-        //#region FrequencyAllocationOfOriginalMessage
-        //private ObservableCollection<SymbolFrequency> _FrequencyAllocOfRecivedMessage = new();
-        //public ObservableCollection<SymbolFrequency> FrequencyAllocOfRecivedMessage
-        //{
-        //    get => _FrequencyAllocOfRecivedMessage;
-        //    set => Set(ref _FrequencyAllocOfRecivedMessage, value);
-        //}
-        //#endregion
 
         #region ReplacementAlphabet
         private RSCAlphabet _ReplacementAlphabet;
@@ -100,11 +77,36 @@ namespace RSCSteganographicMethod.ViemModules
         #endregion
 
         #region Message
-        private string _Message;
+        private string _Message = "";
         public string Message
         {
             get => _Message;
-            set => Set(ref _Message, value);
+            set
+            {
+                Set(ref _Message, value);
+                OnPropertyChanged(nameof(FileCappacityStr));
+            }
+        }
+        #endregion
+        #region DecryptedMessage
+        private string _DecryptedMessage;
+        public string DecryptedMessage
+        {
+            get => _DecryptedMessage;
+            set => Set(ref _DecryptedMessage, value);
+        }
+        #endregion
+
+        #region BitsInMessage
+        private int _BitsInMessage = 16;
+        public int BitsInMessage
+        {
+            get => _BitsInMessage;
+            set
+            {
+                Set(ref _BitsInMessage, value);
+                OnPropertyChanged(nameof(FileCappacityStr));
+            }
         }
         #endregion
 
@@ -116,13 +118,40 @@ namespace RSCSteganographicMethod.ViemModules
             set => Set(ref _EncryptionTime, value);
         }
         #endregion
-
         #region DecryptionTime
         private double _DecryptionTime;
         public double DecryptionTime
         {
             get => _DecryptionTime;
             set => Set(ref _DecryptionTime, value);
+        }
+        #endregion
+
+        #region FileCappacity
+        public long FileCappacity
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(SourceEncryptFile) && File.Exists(SourceEncryptFile))
+                {
+                    return RSCSteganographicAnalyzer.Capacity(File.ReadAllText(SourceEncryptFile), ReplacementAlphabet);
+                }
+                return 0;
+            }
+        }
+        #endregion
+        #region FileCappacityStr
+        public string FileCappacityStr
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(SourceEncryptFile) && File.Exists(SourceEncryptFile))
+                {
+                    var capacity = RSCSteganographicAnalyzer.Capacity(File.ReadAllText(SourceEncryptFile), ReplacementAlphabet);
+                    return $"Занято {(Message.Length + 1) * BitsInMessage} из {capacity} бит";
+                }
+                return "0";
+            }
         }
         #endregion
 
@@ -180,19 +209,6 @@ namespace RSCSteganographicMethod.ViemModules
             _ReplacementAlphabet.UsedAlphabets.Add(Alphabet.EnglishAlphabet);
         }
 
-        //public void UpdateFrequency(string sourceText, string resultText)
-        //{
-        //    FrequencyAllocOfOriginalMessage = new ObservableCollection<SymbolFrequency>(
-        //       AlphabetAnalyzer.SymbolFrequency(Alphabet.ToList(), sourceText)
-        //       .Select(x => new SymbolFrequency(x.Key, x.Value / (float)sourceText.Length * 100.0f)));
-
-        //    FrequencyAllocOfRecivedMessage = new ObservableCollection<SymbolFrequency>(
-        //        AlphabetAnalyzer.SymbolFrequency(Alphabet.ToList(), resultText)
-        //        .Select(x => new SymbolFrequency(x.Key, x.Value / (float)resultText.Length * 100.0f)));
-
-        //    OnPropertyChanged(nameof(SelectedOperationTypeIndex));
-        //}
-
         public bool CheckFile(string path, string msgToPath, string msgToNotExist)
         {
             if (string.IsNullOrEmpty(path))
@@ -226,7 +242,6 @@ namespace RSCSteganographicMethod.ViemModules
         public bool CheckDecryptInput()
         {
             CheckFile(SourceDecryptFile, "исходному", "Исходный");
-            CheckFile(ResultDecryptFile, "результирующему");
             return true;
         }
 
@@ -234,20 +249,17 @@ namespace RSCSteganographicMethod.ViemModules
         {
             if (!CheckEncryptInput()) return;
             string sourceText = File.ReadAllText(SourceEncryptFile);
-            string resultText = RSCSteganographicEncrypter.BenchmarkedEncrypt(out double encryptionTime, sourceText, Message, ReplacementAlphabet);
+            string resultText = RSCSteganographicEncrypter.BenchmarkedEncrypt(out double encryptionTime, sourceText, Message, ReplacementAlphabet, BitsInMessage);
             EncryptionTime = encryptionTime;
             File.WriteAllText(ResultEncryptFile, resultText);
-            //UpdateFrequency(sourceText, resultText);
         }
 
         public void Decrypt()
         {
             if (!CheckDecryptInput()) return;
             string sourceText = File.ReadAllText(SourceDecryptFile);
-            string resultText = RSCSteganographicEncrypter.BenchmarkedDecrypt(out double decryptionTime, sourceText, ReplacementAlphabet);
+            DecryptedMessage = RSCSteganographicEncrypter.BenchmarkedDecrypt(out double decryptionTime, sourceText, ReplacementAlphabet, BitsInMessage);
             DecryptionTime = decryptionTime;
-            File.WriteAllText(ResultDecryptFile, resultText);
-            //UpdateFrequency(sourceText, resultText);
         }
     }
 }

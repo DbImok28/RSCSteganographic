@@ -1,10 +1,7 @@
 ﻿using ReplacementSimilarCharactersSteganographicMethod.Models;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace RSCSteganographicMethod.Models
@@ -15,19 +12,31 @@ namespace RSCSteganographicMethod.Models
     {
         public static readonly string Name = "Steganographic method for replacing similar characters";
 
-        public static string ToStringWithBits(char data)
+        public static string ToStringWithBits(char data, int symbolLength = 16)
         {
-            return Convert.ToString((byte)data, 2).PadLeft(8, '0');
+            byte[] bytes = BitConverter.GetBytes(data).Take(symbolLength / 8).ToArray();
+            string bits = "";
+            foreach (var dataByte in bytes)
+            {
+                bits += Convert.ToString(dataByte, 2).PadLeft(8, '0');
+            }
+            return bits;
         }
 
-        public static char FromStringWithBits(string str)
+        public static char FromStringWithBits(string str, int symbolLength = 16)
         {
-            return (char)Convert.ToByte(str.Substring(0, 8), 2);
+            byte[] bytes = new byte[symbolLength / 8];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(str.Substring(i * 8, 8), 2);
+            }
+            return BitConverter.ToChar(bytes);
         }
 
-        public static string Encrypt(string rawData, string text, RSCAlphabet alphabet)
+        public static string Encrypt(string rawData, string text, RSCAlphabet alphabet, int symbolLength = 16)
         {
             char[] buffer = new char[rawData.Length];
+            int readIndex = 0;
             for (int textIndex = 0; textIndex < text.Length + 1; ++textIndex)
             {
                 var symbol = '\0';
@@ -37,34 +46,49 @@ namespace RSCSteganographicMethod.Models
                 }
 
                 var bits = ToStringWithBits(symbol);
-                foreach (var bit in bits)
+                for (int bitIndex = 0; bitIndex < bits.Length;)
                 {
-                    for (int readIndex = 0; readIndex < rawData.Length; readIndex++)
+                    var bit = bits[bitIndex];
+                    var rawDataSymbol = rawData[readIndex];
+
+                    if (alphabet.Contains(rawDataSymbol))
                     {
-                        var rawDataSymbol = rawData[readIndex];
-                        if (alphabet.Contains(rawDataSymbol))
+                        var (From, To) = alphabet.GetReplacementPair(rawDataSymbol);
+                        if (bit == '0')
                         {
-                            var (From, To) = alphabet.GetReplacementPair(rawDataSymbol);
-                            if (bit == '0')
-                            {
-                                buffer[readIndex] = From;
-                            }
-                            else
-                            {
-                                buffer[readIndex] = To;
-                            }
+                            buffer[readIndex] = From;
+                            ++bitIndex;
                         }
                         else
                         {
-                            buffer[readIndex] = rawDataSymbol;
+                            buffer[readIndex] = To;
+                            ++bitIndex;
                         }
                     }
+                    else
+                    {
+                        buffer[readIndex] = rawDataSymbol;
+                    }
+                    ++readIndex;
+                    if (readIndex >= rawData.Length)
+                    {
+                        break;
+                    }
                 }
+                if (readIndex >= rawData.Length)
+                {
+                    break;
+                }
+            }
+            while (readIndex < rawData.Length)
+            {
+                buffer[readIndex] = rawData[readIndex];
+                ++readIndex;
             }
             return string.Concat(buffer);
         }
 
-        public static string Decrypt(string data, RSCAlphabet alphabet, string? encryptedtextAlphabet = null)
+        public static string Decrypt(string data, RSCAlphabet alphabet, int symbolLength = 16, string? encryptedtextAlphabet = null)
         {
             StringBuilder resutlSB = new StringBuilder();
             StringBuilder bitsSB = new StringBuilder();
@@ -82,7 +106,7 @@ namespace RSCSteganographicMethod.Models
                         bitsSB.Append('1');
                     }
                 }
-                if (bitsSB.Length >= 8)
+                if (bitsSB.Length >= 16)
                 {
                     var newSymbol = FromStringWithBits(bitsSB.ToString());
                     if (newSymbol == '\0')
@@ -96,20 +120,20 @@ namespace RSCSteganographicMethod.Models
             return resutlSB.ToString();
         }
 
-        public static string BenchmarkedEncrypt(out double time, string rawData, string text, RSCAlphabet alphabet)
+        public static string BenchmarkedEncrypt(out double time, string rawData, string text, RSCAlphabet alphabet, int symbolLength = 16)
         {
             Stopwatch stopWatch = new();
             stopWatch.Start();
-            var result = Encrypt(rawData, text, alphabet);
+            var result = Encrypt(rawData, text, alphabet, symbolLength);
             time = stopWatch.Elapsed.TotalMilliseconds;
             return result;
         }
 
-        public static string BenchmarkedDecrypt(out double time, string data, RSCAlphabet alphabet, string? encryptedtextAlphabet = null)
+        public static string BenchmarkedDecrypt(out double time, string data, RSCAlphabet alphabet, int symbolLength = 16, string? encryptedtextAlphabet = null)
         {
             Stopwatch stopWatch = new();
             stopWatch.Start();
-            var result = Decrypt(data, alphabet, encryptedtextAlphabet);
+            var result = Decrypt(data, alphabet, symbolLength, encryptedtextAlphabet);
             time = stopWatch.Elapsed.TotalMilliseconds;
             return result;
         }
