@@ -1,10 +1,13 @@
-﻿using ReplacementSimilarCharactersSteganographicMethod.Models;
+﻿using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf;
+using ReplacementSimilarCharactersSteganographicMethod.Models;
 using RSCSteganographicMethod.Infrastructure.Commands;
 using RSCSteganographicMethod.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Linq;
 
 namespace RSCSteganographicMethod.ViemModules
 {
@@ -159,6 +162,14 @@ namespace RSCSteganographicMethod.ViemModules
         public ICommand EncryptCommand { get; }
         private void OnEncryptCommandExecuted(object? par) => Encrypt();
         #endregion
+        #region RemoveReplacement
+        public ICommand RemoveReplacementCommand { get; }
+        private void OnRemoveReplacementCommandExecuted(object? par) => RemoveReplacement(par != null ? (string)par : "");
+        #endregion
+        #region AddReplacement
+        public ICommand AddReplacementCommand { get; }
+        private void OnAddReplacementCommandExecuted(object? par) => AddReplacement((object[])par);
+        #endregion
         #region Decrypt
         public ICommand DecryptCommand { get; }
         private void OnDecryptCommandExecuted(object? par) => Decrypt();
@@ -168,6 +179,8 @@ namespace RSCSteganographicMethod.ViemModules
         {
             EncryptCommand = new LambdaCommand(OnEncryptCommandExecuted);
             DecryptCommand = new LambdaCommand(OnDecryptCommandExecuted);
+            RemoveReplacementCommand = new LambdaCommand(OnRemoveReplacementCommandExecuted);
+            AddReplacementCommand = new LambdaCommand(OnAddReplacementCommandExecuted);
 
             _OperationType = new List<string>()
             {
@@ -245,13 +258,47 @@ namespace RSCSteganographicMethod.ViemModules
             return true;
         }
 
+        void RemoveReplacement(string key)
+        {
+            if (!string.IsNullOrEmpty(key))
+            {
+                ReplacementAlphabet.Remove(key[3]);
+                OnPropertyChanged(nameof(ReplacementAlphabet));
+            }
+        }
+
+        void AddReplacement(object[] pair)
+        {
+            if (pair.Length == 2 && !string.IsNullOrEmpty((string)pair[0]) && !string.IsNullOrEmpty((string)pair[1]))
+            {
+                ReplacementAlphabet.Add(((string)pair[0])[0], ((string)pair[1])[0]);
+                OnPropertyChanged(nameof(ReplacementAlphabet));
+            }
+        }
+
         public void Encrypt()
         {
             if (!CheckEncryptInput()) return;
             string sourceText = File.ReadAllText(SourceEncryptFile);
             string resultText = RSCSteganographicEncrypter.BenchmarkedEncrypt(out double encryptionTime, sourceText, Message, ReplacementAlphabet, BitsInMessage);
             EncryptionTime = encryptionTime;
-            File.WriteAllText(ResultEncryptFile, resultText);
+            if (Path.GetExtension(ResultEncryptFile) == ".pdf")
+            {
+                //PdfReader reader = new PdfReader(ResultEncryptFile);
+                //string text = string.Empty;
+
+                //reader.
+                //for (int page = 1; page <= reader.NumberOfPages; page++)
+                //{
+                //    text += PdfTextExtractor.GetTextFromPage(reader, page);
+                //}
+                //reader.Close();
+                //return text;
+            }
+            else
+            {
+                File.WriteAllText(ResultEncryptFile, resultText);
+            }
         }
 
         public void Decrypt()

@@ -54,27 +54,6 @@
                 </Style>
             </TabControl.Resources>
             <TabItem Header="Encrypt" Background="{StaticResource BackgroundColor}" BorderThickness="0">
-                <!--<StackPanel Margin="0,5,0,5" Grid.Row="1" VerticalAlignment="Stretch">
-                    <Label Margin="10,5,10,0" Content="Расшифрование" HorizontalAlignment="Left"/>
-                    <TextBox TextWrapping="WrapWithOverflow" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"></TextBox>
-                    <Label Margin="10,5,10,0" Content="Шифрование" HorizontalAlignment="Left"/>
-                    <DockPanel Margin="10,5,10,0" Height="25">
-                        <Label Content="Исходный файл" Width="200"/>
-                        <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding SourceEncryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                    </DockPanel>
-                    <DockPanel Margin="10,5,10,0" Height="25">
-                        <Label Content="Результирующий файла" Width="200"/>
-                        <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding ResultEncryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                    </DockPanel>
-                    <DockPanel Margin="10,5,10,0" Height="25">
-                        <Label Content="" Width="200"/>
-                        <Button Content="Зашифровать" Command="{Binding EncryptCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
-                    </DockPanel>
-                    <DockPanel Margin="10,5,10,0" Height="25">
-                        <Label Content="Затрачено времени" Width="200"/>
-                        <Label Content="{Binding EncryptionTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                    </DockPanel>
-                </StackPanel>-->
                 <DockPanel Margin="0,5,0,5" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <DockPanel DockPanel.Dock="Top" VerticalAlignment="Top">
                         <Label Margin="10,5,10,0" Content="Шифрование" HorizontalAlignment="Left"/>
@@ -182,11 +161,12 @@
 
                             <TextBlock Text="{Binding Key}" Width="50" Height="18" DockPanel.Dock="Left"/>
                             <!--<TextBlock Text="->" Width="25" Height="18" DockPanel.Dock="Left"></TextBlock>-->
-                            <fa:FontAwesome Margin="0,0,10,0" Icon="ArrowRight" VerticalAlignment="Center" Foreground="{StaticResource WhiteElementForegroundColor}"></fa:FontAwesome>
+                            <fa:FontAwesome Margin="0,0,10,0" Icon="ArrowsH" VerticalAlignment="Center" Foreground="{StaticResource WhiteElementForegroundColor}"></fa:FontAwesome>
                             <TextBlock Text="{Binding Value}" Width="50" Height="18" DockPanel.Dock="Left"/>
                             <Button Margin="10,0,10,0" DockPanel.Dock="Right" HorizontalAlignment="Right" 
                                 Background="{StaticResource ElementBackgroundColor}" 
                                 BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1" Width="17" Height="17"
+                                    Command="{Binding MainVM.RemoveReplacementCommand, Source={StaticResource vmlocator}}"
                                     CommandParameter="{Binding Key}">
                                 <fa:FontAwesome Icon="Remove" FontSize="12" Foreground="{StaticResource ElementForegroundColor}"/>
                             </Button>
@@ -202,10 +182,17 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
             <DockPanel VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Margin="10,5,10,5" Height="25" Panel.ZIndex="1">
-                <TextBox Margin="4,0,4,0" TextAlignment="Center" Width="23" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                <TextBox Margin="4,0,4,0" TextAlignment="Center" x:Name="Key" Width="23" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                 <fa:FontAwesome Icon="ArrowRight" VerticalAlignment="Center" Foreground="{StaticResource WhiteElementForegroundColor}"></fa:FontAwesome>
-                <TextBox Margin="4,0,4,0" TextAlignment="Center" Width="23" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                <Button Margin="4,0,4,0" Content="Добавить" Command="{Binding AddReplacementAlphabetSymbol}" CommandParameter="{}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>
+                <TextBox Margin="4,0,4,0" TextAlignment="Center" x:Name="Value" Width="23" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                <Button Margin="4,0,4,0" Content="Добавить" Command="{Binding AddReplacementCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1">
+                    <Button.CommandParameter>
+                        <MultiBinding Converter="{StaticResource MultyParamsConverter}">
+                            <Binding Path="Text" ElementName="Key"/>
+                            <Binding Path="Text" ElementName="Value"/>
+                        </MultiBinding>
+                    </Button.CommandParameter>
+                </Button>
             </DockPanel>
         </DockPanel>
         <!--<ItemsControl Grid.Column="1"

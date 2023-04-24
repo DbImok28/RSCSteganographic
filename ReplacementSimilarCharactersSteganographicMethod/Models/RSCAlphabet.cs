@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Documents;
@@ -47,6 +48,11 @@ namespace ReplacementSimilarCharactersSteganographicMethod.Models
             }
             ReplaceDictionary.Add(from, to);
             return true;
+        }
+
+        public void Remove(char key)
+        {
+            ReplaceDictionary.Remove(key);
         }
 
         public string FindAlphabetShortName(char c)
