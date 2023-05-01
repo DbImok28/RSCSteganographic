@@ -314,7 +314,7 @@ namespace RSCSteganographicMethod.ViemModules
             return sb.ToString();
         }
 
-        public void WriteAllTextPDF(string sourcePath, string resultPath, string content)
+        public void WriteAllTextPDF(string resultPath, string content)
         {
             PdfWriter writer = new PdfWriter(resultPath);
             PdfDocument pdfDoc = new PdfDocument(writer);
@@ -340,7 +340,7 @@ namespace RSCSteganographicMethod.ViemModules
                 EncryptionTime = encryptionTime;
                 if (Path.GetExtension(ResultEncryptFile) == ".pdf")
                 {
-                    WriteAllTextPDF(SourceEncryptFile, ResultEncryptFile, resultText);
+                    WriteAllTextPDF(ResultEncryptFile, resultText);
                 }
                 else
                 {
