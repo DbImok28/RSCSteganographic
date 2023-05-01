@@ -1,13 +1,23 @@
-﻿using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf;
-using ReplacementSimilarCharactersSteganographicMethod.Models;
+﻿using ReplacementSimilarCharactersSteganographicMethod.Models;
 using RSCSteganographicMethod.Infrastructure.Commands;
 using RSCSteganographicMethod.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Linq;
+using System.Text;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using iText.Kernel.Pdf.Canvas.Parser;
+using iText.IO.Font.Constants;
+using iText.Kernel.Font;
+using iText.IO.Font;
+using System;
+using iText.Pdfa;
+using System.Diagnostics;
 
 namespace RSCSteganographicMethod.ViemModules
 {
@@ -75,7 +85,11 @@ namespace RSCSteganographicMethod.ViemModules
         public RSCAlphabet ReplacementAlphabet
         {
             get => _ReplacementAlphabet;
-            set => Set(ref _ReplacementAlphabet, value);
+            set
+            {
+                Set(ref _ReplacementAlphabet, value);
+                OnPropertyChanged(nameof(FileCappacityStr));
+            }
         }
         #endregion
 
@@ -220,6 +234,10 @@ namespace RSCSteganographicMethod.ViemModules
             });
             _ReplacementAlphabet.UsedAlphabets.Add(Alphabet.RusianAlphabet);
             _ReplacementAlphabet.UsedAlphabets.Add(Alphabet.EnglishAlphabet);
+
+            _Message = "Hello";
+            SourceEncryptFile = "f1.txt";
+            ResultEncryptFile = "f1.pdf";
         }
 
         public bool CheckFile(string path, string msgToPath, string msgToNotExist)
@@ -264,6 +282,7 @@ namespace RSCSteganographicMethod.ViemModules
             {
                 ReplacementAlphabet.Remove(key[3]);
                 OnPropertyChanged(nameof(ReplacementAlphabet));
+                OnPropertyChanged(nameof(FileCappacityStr));
             }
         }
 
@@ -273,40 +292,90 @@ namespace RSCSteganographicMethod.ViemModules
             {
                 ReplacementAlphabet.Add(((string)pair[0])[0], ((string)pair[1])[0]);
                 OnPropertyChanged(nameof(ReplacementAlphabet));
+                OnPropertyChanged(nameof(FileCappacityStr));
             }
+        }
+
+        public string ReadAllTextPDF(string path)
+        {
+            var sb = new StringBuilder();
+            var pdfReader = new PdfReader(path);
+            var pdfDoc = new PdfDocument(pdfReader);
+            for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+            {
+                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+                var page = pdfDoc.GetPage(i);
+                string text = PdfTextExtractor.GetTextFromPage(page, strategy);
+                sb.Append(text);
+            }
+            pdfDoc.Close();
+            pdfReader.Close();
+            return sb.ToString();
+        }
+
+        public void WriteAllTextPDF(string sourcePath, string resultPath, string content)
+        {
+            PdfWriter writer = new PdfWriter(resultPath);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+            PdfFont font = PdfFontFactory.CreateFont("freesans.ttf", "Cp1251", PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);/*, PdfEncodings.WINANSI*///PdfEncodings.WINANSI
+            Paragraph paragraph = new Paragraph()
+               .SetFont(font)
+               .SetFontSize(14)
+               .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT)
+               .Add(content);
+            document.Add(paragraph);
+            pdfDoc.Close();
+            writer.Close();
         }
 
         public void Encrypt()
         {
-            if (!CheckEncryptInput()) return;
-            string sourceText = File.ReadAllText(SourceEncryptFile);
-            string resultText = RSCSteganographicEncrypter.BenchmarkedEncrypt(out double encryptionTime, sourceText, Message, ReplacementAlphabet, BitsInMessage);
-            EncryptionTime = encryptionTime;
-            if (Path.GetExtension(ResultEncryptFile) == ".pdf")
+            try
             {
-                //PdfReader reader = new PdfReader(ResultEncryptFile);
-                //string text = string.Empty;
+                if (!CheckEncryptInput()) return;
+                string sourceText = File.ReadAllText(SourceEncryptFile);
+                string resultText = RSCSteganographicEncrypter.BenchmarkedEncrypt(out double encryptionTime, sourceText, Message, ReplacementAlphabet, BitsInMessage);
+                EncryptionTime = encryptionTime;
+                if (Path.GetExtension(ResultEncryptFile) == ".pdf")
+                {
+                    WriteAllTextPDF(SourceEncryptFile, ResultEncryptFile, resultText);
+                }
+                else
+                {
+                    File.WriteAllText(ResultEncryptFile, resultText);
 
-                //reader.
-                //for (int page = 1; page <= reader.NumberOfPages; page++)
-                //{
-                //    text += PdfTextExtractor.GetTextFromPage(reader, page);
-                //}
-                //reader.Close();
-                //return text;
+                }
             }
-            else
+            catch (Exception e)
             {
-                File.WriteAllText(ResultEncryptFile, resultText);
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         public void Decrypt()
         {
-            if (!CheckDecryptInput()) return;
-            string sourceText = File.ReadAllText(SourceDecryptFile);
-            DecryptedMessage = RSCSteganographicEncrypter.BenchmarkedDecrypt(out double decryptionTime, sourceText, ReplacementAlphabet, BitsInMessage);
-            DecryptionTime = decryptionTime;
+            try
+            {
+                if (!CheckDecryptInput()) return;
+                string sourceText = "";
+                if (Path.GetExtension(SourceDecryptFile) == ".pdf")
+                {
+                    sourceText = ReadAllTextPDF(SourceDecryptFile);
+                }
+                else
+                {
+                    sourceText = File.ReadAllText(SourceDecryptFile);
+                }
+
+                DecryptedMessage = RSCSteganographicEncrypter.BenchmarkedDecrypt(out double decryptionTime, sourceText, ReplacementAlphabet, BitsInMessage);
+                DecryptionTime = decryptionTime;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
