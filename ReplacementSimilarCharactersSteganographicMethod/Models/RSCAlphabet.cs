@@ -30,14 +30,6 @@ namespace ReplacementSimilarCharactersSteganographicMethod.Models
         {
             var finded = ReplaceDictionary.ToList().Find(x => x.Key == c || x.Value == c);
             return (finded.Key, finded.Value);
-            //if (finded.Key == c)
-            //{
-            //    return (c, finded.Value);
-            //}
-            //else
-            //{
-            //    return (c, finded.Key);
-            //}
         }
 
         public bool Add(char from, char to)

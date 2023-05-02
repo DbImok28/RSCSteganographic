@@ -53,10 +53,10 @@
                     </Setter>
                 </Style>
             </TabControl.Resources>
-            <TabItem Header="Encrypt" Background="{StaticResource BackgroundColor}" BorderThickness="0">
+            <TabItem Header="Шифрование" Background="{StaticResource BackgroundColor}" BorderThickness="0">
                 <DockPanel Margin="0,5,0,5" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <DockPanel DockPanel.Dock="Top" VerticalAlignment="Top">
-                        <Label Margin="10,5,10,0" Content="Шифрование" HorizontalAlignment="Left"/>
+                        <Label Margin="10,5,10,0" Content="Сообщение" HorizontalAlignment="Left"/>
                     </DockPanel>
                     <DockPanel DockPanel.Dock="Top" 
                             HorizontalAlignment="Stretch" 
@@ -105,10 +105,10 @@
                     </DockPanel>
                 </DockPanel>
             </TabItem>
-            <TabItem Header="Decrypt" Background="{StaticResource BackgroundColor}">
+            <TabItem Header="Расшифровка" Background="{StaticResource BackgroundColor}">
                 <DockPanel Margin="0,5,0,5" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <DockPanel DockPanel.Dock="Top" VerticalAlignment="Top">
-                        <Label Margin="10,5,10,0" Content="Расшифровка" HorizontalAlignment="Left"/>
+                        <Label Margin="10,5,10,0" Content="Извлеченное сообщенное" HorizontalAlignment="Left"/>
                     </DockPanel>
                     <TextBox 
                         Text="{Binding DecryptedMessage}"
@@ -132,10 +132,6 @@
                                 <Label Content="Исходный файл" Width="200"/>
                                 <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding SourceDecryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                             </DockPanel>
-                            <!--<DockPanel Margin="10,5,10,0" Height="25">
-                                <Label Content="Результирующий файла" Width="200"/>
-                                <controls:TextBoxWithNote NoteText="Введите путь к файлу" Text="{Binding ResultDecryptFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                            </DockPanel>-->
                             <DockPanel Margin="10,5,10,0" Height="25">
                                 <Label Content="" Width="200"/>
                                 <Button Content="Расшифровать" Command="{Binding DecryptCommand}" BorderBrush="{StaticResource ElementBorderColor}" BorderThickness="1"/>

@@ -45,7 +45,7 @@ namespace RSCSteganographicMethod.Models
                     symbol = text[textIndex];
                 }
 
-                var bits = ToStringWithBits(symbol);
+                var bits = ToStringWithBits(symbol, symbolLength);
                 for (int bitIndex = 0; bitIndex < bits.Length;)
                 {
                     var bit = bits[bitIndex];
@@ -108,7 +108,7 @@ namespace RSCSteganographicMethod.Models
                 }
                 if (bitsSB.Length >= 16)
                 {
-                    var newSymbol = FromStringWithBits(bitsSB.ToString());
+                    var newSymbol = FromStringWithBits(bitsSB.ToString(), symbolLength);
                     if (newSymbol == '\0')
                     {
                         break;

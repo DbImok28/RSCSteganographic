@@ -16,8 +16,6 @@ using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.IO.Font;
 using System;
-using iText.Pdfa;
-using System.Diagnostics;
 
 namespace RSCSteganographicMethod.ViemModules
 {
@@ -71,7 +69,7 @@ namespace RSCSteganographicMethod.ViemModules
         }
         #endregion
         #region SourceDecryptFile
-        private string _SourceDecryptFile;
+        private string _SourceDecryptFile = "";
         public string SourceDecryptFile
         {
             get => _SourceDecryptFile;
@@ -106,7 +104,7 @@ namespace RSCSteganographicMethod.ViemModules
         }
         #endregion
         #region DecryptedMessage
-        private string _DecryptedMessage;
+        private string _DecryptedMessage = "";
         public string DecryptedMessage
         {
             get => _DecryptedMessage;
@@ -182,7 +180,7 @@ namespace RSCSteganographicMethod.ViemModules
         #endregion
         #region AddReplacement
         public ICommand AddReplacementCommand { get; }
-        private void OnAddReplacementCommandExecuted(object? par) => AddReplacement((object[])par);
+        private void OnAddReplacementCommandExecuted(object? par) => AddReplacement((object[]?)par);
         #endregion
         #region Decrypt
         public ICommand DecryptCommand { get; }
@@ -240,7 +238,7 @@ namespace RSCSteganographicMethod.ViemModules
             ResultEncryptFile = "f1.pdf";
         }
 
-        public bool CheckFile(string path, string msgToPath, string msgToNotExist)
+        public static bool CheckFile(string path, string msgToPath, string msgToNotExist)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -254,7 +252,7 @@ namespace RSCSteganographicMethod.ViemModules
             }
             return true;
         }
-        public bool CheckFile(string path, string msgToPath)
+        public static bool CheckFile(string path, string msgToPath)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -286,9 +284,9 @@ namespace RSCSteganographicMethod.ViemModules
             }
         }
 
-        void AddReplacement(object[] pair)
+        void AddReplacement(object[]? pair)
         {
-            if (pair.Length == 2 && !string.IsNullOrEmpty((string)pair[0]) && !string.IsNullOrEmpty((string)pair[1]))
+            if (pair != null && pair.Length == 2 && !string.IsNullOrEmpty((string)pair[0]) && !string.IsNullOrEmpty((string)pair[1]))
             {
                 ReplacementAlphabet.Add(((string)pair[0])[0], ((string)pair[1])[0]);
                 OnPropertyChanged(nameof(ReplacementAlphabet));
@@ -296,7 +294,7 @@ namespace RSCSteganographicMethod.ViemModules
             }
         }
 
-        public string ReadAllTextPDF(string path)
+        public static string ReadAllTextPDF(string path)
         {
             var sb = new StringBuilder();
             var pdfReader = new PdfReader(path);
@@ -314,11 +312,11 @@ namespace RSCSteganographicMethod.ViemModules
             return sb.ToString();
         }
 
-        public void WriteAllTextPDF(string resultPath, string content)
+        public static void WriteAllTextPDF(string resultPath, string content)
         {
-            PdfWriter writer = new PdfWriter(resultPath);
-            PdfDocument pdfDoc = new PdfDocument(writer);
-            Document document = new Document(pdfDoc);
+            PdfWriter writer = new(resultPath);
+            PdfDocument pdfDoc = new(writer);
+            Document document = new(pdfDoc);
             PdfFont font = PdfFontFactory.CreateFont("freesans.ttf", "Cp1251", PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);/*, PdfEncodings.WINANSI*///PdfEncodings.WINANSI
             Paragraph paragraph = new Paragraph()
                .SetFont(font)
