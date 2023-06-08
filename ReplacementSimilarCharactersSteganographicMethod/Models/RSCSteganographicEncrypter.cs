@@ -88,7 +88,7 @@ namespace RSCSteganographicMethod.Models
             return string.Concat(buffer);
         }
 
-        public static string Decrypt(string data, RSCAlphabet alphabet, int symbolLength = 16, string? encryptedtextAlphabet = null)
+        public static string Decrypt(string data, RSCAlphabet alphabet, int symbolLength = 16)
         {
             StringBuilder resutlSB = new StringBuilder();
             StringBuilder bitsSB = new StringBuilder();
@@ -129,11 +129,11 @@ namespace RSCSteganographicMethod.Models
             return result;
         }
 
-        public static string BenchmarkedDecrypt(out double time, string data, RSCAlphabet alphabet, int symbolLength = 16, string? encryptedtextAlphabet = null)
+        public static string BenchmarkedDecrypt(out double time, string data, RSCAlphabet alphabet, int symbolLength = 16)
         {
             Stopwatch stopWatch = new();
             stopWatch.Start();
-            var result = Decrypt(data, alphabet, symbolLength, encryptedtextAlphabet);
+            var result = Decrypt(data, alphabet, symbolLength);
             time = stopWatch.Elapsed.TotalMilliseconds;
             return result;
         }
